@@ -72,72 +72,40 @@
                 container.appendChild(input);
 
                 input.addEventListener('change', function(e){
-                    self._dump(element.key, true, e.target.value);
+                    self._dump(element.key, e.target.value);
                 })
             }
 
             box.addEventListener('click', function(ev){
-                var classList = self._toArray(radioDiv.classList);
+                var checkedDivs = document.querySelectorAll('.qs-radio-text-div.checked');
 
-                if(classList.indexOf('checked') > -1){
-                    radioDiv.className = 'qs-radio-text-div';
-                    if(element.need_text){
-                        input.className = 'qs-radio-text-input';
-                    }
+                for (var i = 0; i < checkedDivs.length; i++) {
+                    checkedDivs[i].className = 'qs-radio-text-div';
+                }
 
-                    self._dump(element.key, false);
-                }else{
-                    radioDiv.className = 'qs-radio-text-div checked';
-                    if(element.need_text){
-                        input.className = 'qs-radio-text-input checked';
-                        self._dump(element.key, true, input.value);
-                    }
-                    else{
-                        self._dump(element.key, true);
-                    }
-
+                radioDiv.className = 'qs-radio-text-div checked';
+                if(element.need_text){
+                    input.className = 'qs-radio-text-input checked';
+                    self._dump(element.key, input.value);
+                }
+                else{
+                    self._dump(element.key);
                 }
             });
 
             return container;
         },
-        _dump: function(key, checked, text){
-            var originVal = JSON.parse(this.input.value || '[]');
-            var updated = false;
-            originVal.forEach(function(element){
-                if(element.key == key){
-                    element['checked'] = checked;
-                    if(checked && !!text){
-                        element['text'] = text;
-                    }
-                    updated = true;
-                }
-            });
+        _dump: function(key, text){
+            var newVal = {};
+            newVal['key'] = key;
 
-            if(updated === false){
-                var newVal = {};
-                newVal['key'] = key;
+            newVal['checked'] = true;
 
-                newVal['checked'] = checked;
-
-                if(checked && !!text){
-                    newVal['text'] = text;
-                }
-
-                originVal.push(newVal);
+            if(!!text){
+                newVal['text'] = text;
             }
 
-            originVal = originVal.filter(function(element){
-                return element.checked;
-            });
-
-            if(originVal.length > 0){
-                this.input.value = JSON.stringify(originVal);
-            }
-            else{
-                this.input.value = '';
-            }
-
+            this.input.value = JSON.stringify([newVal]);
         },
         _toArray: function(classList){
             var arr = [];
